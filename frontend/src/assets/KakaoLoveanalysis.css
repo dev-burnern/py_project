@@ -1,0 +1,459 @@
+/* ===== 전체 배경 + 폰트 ===== */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffdee9 0%, #ff9a9e 100%);
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+}
+
+/* ===== 화면 정중앙 카드 배치 ===== */
+.kakao-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== 중앙 카드 ===== */
+.kakao-card {
+  width: 720px;
+  max-width: 94vw;
+  height: 92vh;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 14px 18px 18px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  box-shadow: 0 20px 45px rgba(255, 105, 135, 0.3);
+}
+
+/* ===== 카카오톡 채팅방 헤더 ===== */
+.kakao-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 8px;
+  border-bottom: 1px solid #f7d3df;
+  margin-bottom: 6px;
+}
+
+.kakao-chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kakao-chat-icon {
+  font-size: 16px;
+  color: #555;
+  cursor: default;
+}
+
+.kakao-chat-icon--back {
+  font-size: 20px;
+  padding: 2px 4px;
+}
+
+.kakao-chat-profile {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffe5f0, #ff6b9c);
+}
+
+.kakao-chat-titlebox {
+  display: flex;
+  flex-direction: column;
+}
+
+.kakao-chat-roomname {
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+}
+
+.kakao-chat-status {
+  font-size: 11px;
+  color: #999;
+}
+
+/* 큐피트 아이콘 (크게) */
+.kakao-chat-header-right {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.kakao-chat-cupid {
+  font-size: 28px;
+  cursor: default;
+  user-select: none;
+  color: #f6416c;
+}
+
+/* ===== 타이틀 영역 ===== */
+.kakao-title-area {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.kakao-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: #ff6b9c;
+  color: #ffffff;
+}
+
+.kakao-title {
+  margin: 6px 0 4px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #d7263d;
+}
+
+.kakao-sub {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.kakao-highlight {
+  font-weight: 800;
+  color: #f6416c;
+}
+
+/* ===== 입력 영역 ===== */
+.kakao-input-section {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.kakao-textarea-label {
+  font-size: 12px;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kakao-textarea {
+  width: 100%;
+  min-height: 110px;
+  max-height: 190px;
+  resize: vertical;
+  border-radius: 16px;
+  border: 1px solid #f3c4d9;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  outline: none;
+  box-sizing: border-box;
+  background-color: #fff7fb;
+}
+
+.kakao-textarea::placeholder {
+  color: #c998b4;
+}
+
+.kakao-textarea:focus {
+  border-color: #f6416c;
+  box-shadow: 0 0 0 2px rgba(246, 65, 108, 0.15);
+}
+
+.kakao-help {
+  font-size: 11px;
+  color: #888;
+  margin: 4px 0 0;
+}
+
+/* ===== 버튼 ===== */
+.kakao-button {
+  margin: 8px auto 4px;
+  border: none;
+  padding: 10px 26px;
+  background: #ff6b9c;
+  color: #ffffff;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #d7263d;
+  font-size: 14px;
+}
+.kakao-button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+.kakao-button:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #b51f32;
+}
+
+.kakao-error {
+  color: #ff4b88;
+  font-size: 12px;
+  text-align: center;
+  margin: 4px 0;
+}
+
+/* ===== 결과 영역 (카드 내부 스크롤) ===== */
+.kakao-content {
+  margin-top: 6px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.kakao-content::-webkit-scrollbar {
+  width: 6px;
+}
+.kakao-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.kakao-content::-webkit-scrollbar-thumb {
+  background: rgba(246, 65, 108, 0.35);
+  border-radius: 999px;
+}
+.kakao-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(246, 65, 108, 0.35) transparent;
+}
+
+/* ===== 메신저 말풍선 스타일 ===== */
+.kakao-msg-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.kakao-msg-row--bot {
+  justify-content: flex-start;
+}
+
+.kakao-msg-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffe3ef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.kakao-msg-avatar--hidden {
+  visibility: hidden;
+}
+
+.kakao-msg-bubble {
+  max-width: 80%;
+  background: #fff5f8;
+  border-radius: 18px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #444;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
+}
+
+.kakao-msg-bubble--bot {
+  border-bottom-left-radius: 4px;
+}
+
+.kakao-msg-bubble--bot::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  bottom: 4px;
+  width: 8px;
+  height: 8px;
+  background: #fff5f8;
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.kakao-msg-bubble--wide {
+  max-width: 86%;
+}
+
+.kakao-msg-name {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: #f6416c;
+}
+
+.kakao-msg-name--sub {
+  color: #c27aa4;
+}
+
+.kakao-msg-text {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ===== 섹션 타이틀 ===== */
+.kakao-section-subtitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 10px 0 4px;
+  color: #f6416c;
+}
+
+/* ===== 리스트 & 말풍선 (참여자/키워드 텍스트) ===== */
+.kakao-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 6px;
+}
+
+.kakao-bubble {
+  background: #fdf2f7;
+  border-radius: 999px;
+  padding: 6px 12px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #444;
+  display: inline-block;
+  position: relative;
+}
+
+.kakao-bubble::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  bottom: -3px;
+  width: 7px;
+  height: 7px;
+  background: #fdf2f7;
+  transform: rotate(45deg);
+}
+
+
+
+/* ===== 키워드 Top 5 리스트 ===== */
+/* ===== 키워드 Top 5 리스트 (좁게 & 중앙에 아기자기하게) ===== */
+.keyword-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px auto 10px;
+  width: 85%;               /* 전체 폭 100% → 85%로 축소 */
+  max-width: 420px;         /* 너무 넓어지지 않게 고정 */
+}
+
+.keyword-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  margin: 6px auto;
+  width: 100%;
+
+  background: #fff5f8;
+  border-radius: 14px;
+
+  font-size: 13px;
+  color: #444;
+
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: 0.15s ease;
+}
+
+/* 살짝 눌리는 효과 */
+.keyword-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(255, 105, 135, 0.15);
+}
+
+.keyword-rank {
+  width: 22px;
+  height: 22px;
+
+  border-radius: 999px;
+  background: #ffb6cf;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+
+  flex-shrink: 0;
+}
+
+.keyword-word {
+  font-weight: 700;
+  color: #f6416c;
+}
+
+.keyword-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: #888;
+}
+
+
+/* ===== 그래프 공통 ===== */
+.kakao-chart-section {
+  margin-top: 8px;
+}
+
+.kakao-chart-title {
+  font-size: 12px;
+  color: #888;
+  margin: 2px 0 4px;
+}
+
+.kakao-chart-box {
+  width: 100%;
+  height: 210px;
+  background: #fff7fb;
+  border-radius: 18px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  border: 1px solid #f8c4da;
+}
+
+.kakao-chart-box--keywords {
+  height: 240px;
+}
+
+/* 워드클라우드 박스 (선택 사용) */
+.kakao-wordcloud-box {
+  width: 100%;
+  background: #fff7fb;
+  border-radius: 18px;
+  border: 1px solid #f8c4da;
+  padding: 8px;
+  box-sizing: border-box;
+}
+.kakao-wordcloud-box img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+}
+
+/* 반응형 보정 */
+@media (max-width: 768px) {
+  .kakao-card {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}

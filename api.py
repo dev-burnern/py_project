@@ -3,11 +3,16 @@ import os
 import base64
 from io import BytesIO
 
-from bottle import Bottle, run, response
+from bottle import Bottle, run, response, request
 from wordcloud import WordCloud
 
 from backend.parser import parse_kakao_chat
-from backend.analysis import analyze_participation, extract_keywords, infer_topic
+from backend.analysis import (
+    analyze_participation,
+    extract_keywords,
+    infer_love_insight,
+    analyze_time_distribution,
+)
 
 app = Bottle()
 
@@ -18,12 +23,13 @@ if not os.path.exists(FONT_PATH):
     FONT_PATH = None
 
 
-# ===== CORS 허용 (Vite 프론트에서 호출 가능하도록) =====
 @app.hook("after_request")
 def enable_cors():
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Origin, Accept, Content-Type, X-Requested-With"
+    response.headers["Access-Control-Allow-Headers"] = (
+        "Origin, Accept, Content-Type, X-Requested-With"
+    )
 
 
 def make_wordcloud_base64(keywords):
@@ -53,31 +59,85 @@ def make_wordcloud_base64(keywords):
     return f"data:image/png;base64,{b64}"
 
 
+def build_analysis_result(df):
+    """
+    공통 분석 로직: participation, keywords, 사랑의 큐피트 분석, 시간대 분석
+    """
+    participation = analyze_participation(df)
+    keywords = extract_keywords(df, top_n=50)  # 워드클라우드용으로 조금 더 많이
+    love = infer_love_insight(keywords)
+    wordcloud_data = make_wordcloud_base64(keywords)
+    time_distribution = analyze_time_distribution(df)
+
+    return {
+        "participation": participation,
+        "keywords": keywords[:10],  # 표시는 Top10만
+        "totalMessages": len(df),
+        # 사랑의 큐피트 전용 필드
+        "interestScore": love["interestScore"],
+        "interestLabel": love["interestLabel"],
+        "topic": love["topic"],        # 한 줄 요약
+        "summary": love["summary"],    # 긴 설명
+        "wordcloud": wordcloud_data,   # ← 프론트에서 <img src=...>로 사용
+        "timeDistribution": time_distribution,  # ← 시간대별 대화량
+    }
+
+
+# ===== (기존) 파일 기반 분석: assets/chat.txt 사용 =====
 @app.get("/api/analyze")
-def analyze():
+def analyze_file():
     filepath = os.path.join("assets", "chat.txt")
 
     if not os.path.exists(filepath):
         response.status = 400
         return {"error": "assets/chat.txt 파일을 찾을 수 없습니다."}
 
-    df = parse_kakao_chat(filepath)
+    try:
+        df = parse_kakao_chat(filepath)
+    except Exception as e:
+        response.status = 400
+        return {"error": f"대화 내용을 읽는 도중 오류가 발생했습니다: {e}"}
+
     if df.empty:
         response.status = 400
         return {"error": "대화 내용을 읽지 못했습니다."}
 
-    participation = analyze_participation(df)
-    keywords = extract_keywords(df, top_n=50)  # 워드클라우드용으로 조금 더 많이
-    topic = infer_topic(keywords)
-    wordcloud_data = make_wordcloud_base64(keywords)
+    return build_analysis_result(df)
 
-    return {
-        "participation": participation,
-        "keywords": keywords[:10],  # 표시는 Top10만
-        "topic": topic,
-        "totalMessages": len(df),
-        "wordcloud": wordcloud_data,  # ← 프론트에서 <img src=...>로 사용
-    }
+
+# ===== (신규) 사이트 내 텍스트 입력 분석 =====
+@app.post("/api/analyze_text")
+def analyze_text():
+    data = request.json or {}
+    raw_text = (data.get("text") or "").strip()
+
+    if not raw_text:
+        response.status = 400
+        return {"error": "분석할 대화 내용을 입력해주세요."}
+
+    # 필요 시 myName 같은 필드도 받을 수 있게 확장 가능
+    # my_name = (data.get("myName") or "").strip()
+
+    # parser를 그대로 활용하기 위해 임시 파일에 기록 후 재사용
+    os.makedirs("assets", exist_ok=True)
+    temp_path = os.path.join("assets", "_temp_input.txt")
+
+    try:
+        with open(temp_path, "w", encoding="utf-8") as f:
+            f.write(raw_text)
+
+        df = parse_kakao_chat(temp_path)
+    except Exception as e:
+        response.status = 400
+        return {"error": f"대화 내용을 파싱하는 중 문제가 발생했습니다: {e}"}
+
+    if df.empty:
+        response.status = 400
+        return {
+            "error": "대화 내용을 하나도 읽지 못했습니다. 카카오톡 내보내기 원본 형식인지 확인해주세요."
+        }
+
+    return build_analysis_result(df)
 
 
 if __name__ == "__main__":
