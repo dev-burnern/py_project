@@ -1,9 +1,12 @@
 # api.py
 import os
+import sys
 import base64
+import threading
+import webbrowser
 from io import BytesIO
 
-from bottle import Bottle, run, response, request
+from bottle import Bottle, run, response, request, static_file
 from wordcloud import WordCloud
 
 from backend.parser import parse_kakao_chat
@@ -15,6 +18,16 @@ from backend.analysis import (
 )
 
 app = Bottle()
+
+# ===== PyInstaller 경로 호환성 처리 =====
+def resource_path(relative_path):
+    """ PyInstaller로 패키징된 경우 임시 폴더(_MEIPASS)에서 리소스를 찾고, 아니면 현재 경로에서 찾음 """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 # ===== 한글 워드클라우드용 폰트 경로 (윈도우 기준) =====
 FONT_PATH = r"C:\Windows\Fonts\malgun.ttf"
@@ -86,7 +99,8 @@ def build_analysis_result(df):
 # ===== (기존) 파일 기반 분석: assets/chat.txt 사용 =====
 @app.get("/api/analyze")
 def analyze_file():
-    filepath = os.path.join("assets", "chat.txt")
+    # 실행 파일 옆에 있는 assets 폴더를 참조하도록 설정
+    filepath = os.path.join(os.getcwd(), "assets", "chat.txt")
 
     if not os.path.exists(filepath):
         response.status = 400
@@ -115,10 +129,7 @@ def analyze_text():
         response.status = 400
         return {"error": "분석할 대화 내용을 입력해주세요."}
 
-    # 필요 시 myName 같은 필드도 받을 수 있게 확장 가능
-    # my_name = (data.get("myName") or "").strip()
-
-    # parser를 그대로 활용하기 위해 임시 파일에 기록 후 재사용
+    # 실행 위치 기준 assets 폴더 사용
     os.makedirs("assets", exist_ok=True)
     temp_path = os.path.join("assets", "_temp_input.txt")
 
@@ -140,5 +151,23 @@ def analyze_text():
     return build_analysis_result(df)
 
 
+# ===== 정적 파일 서빙 (React 빌드 결과물) =====
+@app.route('/assets/<filepath:path>')
+def server_static(filepath):
+    # frontend/dist/assets 폴더 서빙
+    return static_file(filepath, root=resource_path(os.path.join('frontend', 'dist', 'assets')))
+
+@app.route('/')
+@app.route('/<path:path>')
+def serve_index(path=""):
+    # 그 외 모든 요청은 index.html (SPA 라우팅)
+    return static_file("index.html", root=resource_path(os.path.join('frontend', 'dist')))
+
+
+def open_browser():
+    webbrowser.open("http://localhost:5000")
+
 if __name__ == "__main__":
-    run(app, host="localhost", port=5000, debug=True, reloader=True)
+    # 서버 시작 1.5초 후 브라우저 자동 실행
+    threading.Timer(1.5, open_browser).start()
+    run(app, host="localhost", port=5000, debug=True, reloader=False)
