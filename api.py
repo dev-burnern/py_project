@@ -3,7 +3,7 @@ import os
 import sys
 import base64
 import threading
-import webbrowser
+import webview  # pywebview 추가
 from io import BytesIO
 
 from bottle import Bottle, run, response, request, static_file
@@ -164,10 +164,22 @@ def serve_index(path=""):
     return static_file("index.html", root=resource_path(os.path.join('frontend', 'dist')))
 
 
-def open_browser():
-    webbrowser.open("http://localhost:5000")
+def start_server():
+    # Bottle 서버 실행 (메인 스레드 차단 방지를 위해 별도 함수로 분리)
+    run(app, host="localhost", port=5000, debug=False, reloader=False)
 
 if __name__ == "__main__":
-    # 서버 시작 1.5초 후 브라우저 자동 실행
-    threading.Timer(1.5, open_browser).start()
-    run(app, host="localhost", port=5000, debug=True, reloader=False)
+    # 1. 서버 스레드 시작
+    t = threading.Thread(target=start_server)
+    t.daemon = True
+    t.start()
+
+    # 2. PyWebView 창 생성 및 시작 (메인 스레드에서 실행해야 함)
+    webview.create_window(
+        "Kakao Love Analysis", 
+        "http://localhost:5000",
+        width=1200,
+        height=900,
+        resizable=True
+    )
+    webview.start()
