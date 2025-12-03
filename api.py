@@ -7,7 +7,7 @@ import webview  # pywebview 추가
 from io import BytesIO
 
 from bottle import Bottle, run, response, request, static_file
-from wordcloud import WordCloud
+# from wordcloud import WordCloud  <-- 제거
 
 from backend.parser import parse_kakao_chat
 from backend.analysis import (
@@ -29,13 +29,6 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-# ===== 한글 워드클라우드용 폰트 경로 (윈도우 기준) =====
-FONT_PATH = r"C:\Windows\Fonts\malgun.ttf"
-if not os.path.exists(FONT_PATH):
-    # 폰트 못 찾으면 None -> 한글이 깨질 수는 있지만 코드가 죽지는 않게
-    FONT_PATH = None
-
-
 @app.hook("after_request")
 def enable_cors():
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -45,41 +38,14 @@ def enable_cors():
     )
 
 
-def make_wordcloud_base64(keywords):
-    """
-    keywords: [{ "word": str, "count": int }, ...]
-    -> data:image/png;base64,.... 형태 문자열 반환
-    """
-    if not keywords:
-        return None
-
-    freqs = {k["word"]: k["count"] for k in keywords}
-    if not freqs:
-        return None
-
-    # 워드클라우드 생성
-    wc = WordCloud(
-        font_path=FONT_PATH,
-        width=800,
-        height=400,
-        background_color="white",
-    ).generate_from_frequencies(freqs)
-
-    img = wc.to_image()
-    buf = BytesIO()
-    img.save(buf, format="PNG")
-    b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-    return f"data:image/png;base64,{b64}"
-
-
 def build_analysis_result(df):
     """
     공통 분석 로직: participation, keywords, 사랑의 큐피트 분석, 시간대 분석
     """
     participation = analyze_participation(df)
-    keywords = extract_keywords(df, top_n=50)  # 워드클라우드용으로 조금 더 많이
+    keywords = extract_keywords(df, top_n=50)
     love = infer_love_insight(keywords)
-    wordcloud_data = make_wordcloud_base64(keywords)
+    # wordcloud_data = make_wordcloud_base64(keywords) <-- 제거
     time_distribution = analyze_time_distribution(df)
 
     return {
@@ -91,7 +57,7 @@ def build_analysis_result(df):
         "interestLabel": love["interestLabel"],
         "topic": love["topic"],        # 한 줄 요약
         "summary": love["summary"],    # 긴 설명
-        "wordcloud": wordcloud_data,   # ← 프론트에서 <img src=...>로 사용
+        # "wordcloud": wordcloud_data,   <-- 제거
         "timeDistribution": time_distribution,  # ← 시간대별 대화량
     }
 

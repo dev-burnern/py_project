@@ -19,7 +19,6 @@ PyInstaller.__main__.run([
     '--add-data=frontend/dist;frontend/dist',
     # 필요한 라이브러리 명시적 포함
     '--hidden-import=bottle',
-    '--hidden-import=wordcloud',
     '--hidden-import=webview',  # pywebview 추가
     '--hidden-import=clr',      # pythonnet (Windows용)
     # 콘솔 창 숨기기 (GUI 모드)
