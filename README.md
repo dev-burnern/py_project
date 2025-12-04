@@ -139,3 +139,56 @@ yaml
 - 소셜 데이터 기반 감성 분석 서비스로 확장 가능  
 
 ---
+
+## 5. 빌드 가이드 (Build Guide)
+
+이 프로젝트를 직접 빌드하여 실행 파일(`exe`)을 생성하는 방법입니다.
+
+### 5-1. 필수 요구 사항
+- **Python**: 3.10 이상
+- **Node.js**: 18.0 이상
+- **Git**
+
+### 5-2. 설치 (Installation)
+
+1. **저장소 클론**
+   ```bash
+   git clone https://github.com/dev-burnern/py_project.git
+   cd py_project
+   ```
+
+2. **Python 패키지 설치**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Frontend 패키지 설치**
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+### 5-3. 실행 파일 빌드 (Build)
+
+1. **Frontend 빌드**
+   React 앱을 정적 파일로 빌드합니다.
+   ```bash
+   # frontend 폴더에서
+   npm run build
+   ```
+   > 성공 시 `frontend/dist` 폴더가 생성됩니다.
+
+2. **Backend 및 실행 파일 패키징**
+   PyInstaller를 사용하여 실행 파일(`exe`)을 생성합니다.
+   ```bash
+   # 프로젝트 루트 폴더(py_project)로 이동 후
+   cd ..
+   python build.py
+   ```
+
+### 5-4. 결과물 확인
+빌드가 완료되면 `dist` 폴더 안에 실행 파일이 생성됩니다.
+- **경로**: `dist/KakaoLoveAnalysis.exe`
+- **실행**: 해당 파일을 더블 클릭하여 실행
+
+---
