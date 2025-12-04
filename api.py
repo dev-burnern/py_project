@@ -77,19 +77,41 @@ def analyze_text():
 # --------------------------------
 # 리액트 빌드 파일 서빙
 # --------------------------------
+# PyInstaller로 패키징 시 경로 문제 해결
+if getattr(sys, "frozen", False):
+    # 실행 파일로 실행 중일 때 (임시 폴더 경로 사용)
+    base_path = sys._MEIPASS
+else:
+    # 파이썬 스크립트로 실행 중일 때
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
 @app.route("/assets/<filepath:path>")
 def serve_assets(filepath):
-    return static_file(filepath, root="frontend/dist/assets")
+    return static_file(filepath, root=os.path.join(base_path, "frontend/dist/assets"))
 
 
 @app.route("/")
 @app.route("/<path:path>")
 def serve_index(path=""):
-    return static_file("index.html", root="frontend/dist")
+    return static_file("index.html", root=os.path.join(base_path, "frontend/dist"))
 
 
 # --------------------------------
 # 서버 실행
 # --------------------------------
+def start_server():
+    run(app, host="localhost", port=5000, quiet=True)
+
 if __name__ == "__main__":
-    run(app, host="localhost", port=5000, debug=True)
+    import threading
+    import webview
+    import sys
+
+    # 1. 서버를 별도 스레드에서 실행
+    t = threading.Thread(target=start_server)
+    t.daemon = True
+    t.start()
+
+    # 2. PyWebView 창 열기 (메인 스레드)
+    webview.create_window("카카오톡 대화 분석기 💘", "http://localhost:5000", width=1200, height=800)
+    webview.start()
